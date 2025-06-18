@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>貨幣轉換器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2rem;
+            font-weight: 300;
+        }
+
+        .currency-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            gap: 15px;
+        }
+
+        .currency-input {
+            flex: 2;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .currency-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .currency-select {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .currency-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .swap-btn {
+            display: block;
+            margin: 20px auto;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .swap-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        .rate-info {
+            text-align: center;
+            margin-top: 25px;
+            padding: 15px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 10px;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .loading {
+            text-align: center;
+            color: #667eea;
+            font-size: 0.9rem;
+        }
+
+        .error {
+            color: #e74c3c;
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            .currency-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .currency-input, .currency-select {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💱 貨幣轉換器</h1>
+        
+        <div class="currency-row">
+            <input type="number" class="currency-input" id="amount-one" placeholder="輸入金額" value="1">
+            <select class="currency-select" id="currency-one">
+                <option value="TWD" selected>TWD - 新台幣</option>
+                <option value="USD">USD - 美元</option>
+                <option value="EUR">EUR - 歐元</option>
+                <option value="JPY">JPY - 日圓</option>
+                <option value="GBP">GBP - 英鎊</option>
+                <option value="AUD">AUD - 澳幣</option>
+                <option value="CAD">CAD - 加幣</option>
+                <option value="CHF">CHF - 瑞士法郎</option>
+                <option value="CNY">CNY - 人民幣</option>
+                <option value="HKD">HKD - 港幣</option>
+                <option value="SGD">SGD - 新加坡幣</option>
+                <option value="KRW">KRW - 韓圓</option>
+            </select>
+        </div>
+
+        <button class="swap-btn" id="swap">⇅ 交換貨幣</button>
+
+        <div class="currency-row">
+            <input type="number" class="currency-input" id="amount-two" placeholder="轉換結果" readonly>
+            <select class="currency-select" id="currency-two">
+                <option value="USD" selected>USD - 美元</option>
+                <option value="TWD">TWD - 新台幣</option>
+                <option value="EUR">EUR - 歐元</option>
+                <option value="JPY">JPY - 日圓</option>
+                <option value="GBP">GBP - 英鎊</option>
+                <option value="AUD">AUD - 澳幣</option>
+                <option value="CAD">CAD - 加幣</option>
+                <option value="CHF">CHF - 瑞士法郎</option>
+                <option value="CNY">CNY - 人民幣</option>
+                <option value="HKD">HKD - 港幣</option>
+                <option value="SGD">SGD - 新加坡幣</option>
+                <option value="KRW">KRW - 韓圓</option>
+            </select>
+        </div>
+
+        <div class="rate-info" id="rate-info">
+            <div class="loading">正在載入匯率資訊...</div>
+        </div>
+        
+        <div class="error" id="error-msg" style="display: none;"></div>
+    </div>
+
+    <script>
+        const currencyEl_one = document.getElementById('currency-one');
+        const amountEl_one = document.getElementById('amount-one');
+        const currencyEl_two = document.getElementById('currency-two');
+        const amountEl_two = document.getElementById('amount-two');
+        const rateEl = document.getElementById('rate-info');
+        const swap = document.getElementById('swap');
+        const errorEl = document.getElementById('error-msg');
+
+        // 儲存匯率資料的物件
+        let exchangeRates = {};
+
+        // 取得匯率資料
+        async function fetchExchangeRates() {
+            try {
+                errorEl.style.display = 'none';
+                rateEl.innerHTML = '<div class="loading">正在載入匯率資訊...</div>';
+                
+                // 使用免費的匯率API
+                const response = await fetch('https://api.exchangerate-api.com/v4/latest/TWD');
+                
+                if (!response.ok) {
+                    throw new Error('無法取得匯率資料');
+                }
+                
+                const data = await response.json();
+                exchangeRates = data.rates;
+                
+                // 執行初始計算
+                calculate();
+                
+            } catch (error) {
+                console.error('Error fetching exchange rates:', error);
+                errorEl.textContent = '無法載入匯率資料，請檢查網路連線';
+                errorEl.style.display = 'block';
+                rateEl.innerHTML = '<div class="loading">匯率資料載入失敗</div>';
+            }
+        }
+
+        // 計算匯率轉換
+        function calculate() {
+            const currency_one = currencyEl_one.value;
+            const currency_two = currencyEl_two.value;
+            const amount_one = parseFloat(amountEl_one.value) || 0;
+
+            if (Object.keys(exchangeRates).length === 0) {
+                return;
+            }
+
+            let rate;
+            
+            if (currency_one === 'TWD') {
+                // 從台幣轉換到其他貨幣
+                rate = exchangeRates[currency_two] || 1;
+            } else if (currency_two === 'TWD') {
+                // 從其他貨幣轉換到台幣
+                rate = 1 / (exchangeRates[currency_one] || 1);
+            } else {
+                // 兩種都不是台幣，需要透過台幣做中介
+                const rateToTWD = 1 / (exchangeRates[currency_one] || 1);
+                const rateFromTWD = exchangeRates[currency_two] || 1;
+                rate = rateToTWD * rateFromTWD;
+            }
+
+            const convertedAmount = (amount_one * rate).toFixed(2);
+            amountEl_two.value = convertedAmount;
+
+            // 顯示匯率資訊
+            rateEl.innerHTML = `
+                <strong>1 ${currency_one} = ${rate.toFixed(4)} ${currency_two}</strong><br>
+                <small>匯率資料來源：ExchangeRate-API</small>
+            `;
+        }
+
+        // 交換貨幣
+        function swapCurrencies() {
+            const temp = currencyEl_one.value;
+            currencyEl_one.value = currencyEl_two.value;
+            currencyEl_two.value = temp;
+            calculate();
+        }
+
+        // 事件監聽器
+        currencyEl_one.addEventListener('change', calculate);
+        amountEl_one.addEventListener('input', calculate);
+        currencyEl_two.addEventListener('change', calculate);
+        swap.addEventListener('click', swapCurrencies);
+
+        // 初始化載入匯率
+        fetchExchangeRates();
+
+        // 每5分鐘更新一次匯率
+        setInterval(fetchExchangeRates, 300000);
+    </script>
+</body>
+</html>
