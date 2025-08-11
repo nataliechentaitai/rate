@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>知識管理簡報</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;700&display=swap');
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f0f4f8;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            flex-direction: column;
+        }
+        .slide-container {
+            width: 100vw;
+            max-width: 1600px;
+            height: 56.25vw; /* 16:9 aspect ratio */
+            max-height: 100vh;
+            position: relative;
+            background-color: #ffffff;
+            border-radius: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            display: none; /* 預設隱藏所有簡報頁面 */
+            padding: 4rem;
+            box-sizing: border-box;
+            transition: opacity 0.5s ease-in-out;
+            opacity: 0;
+            flex-direction: row;
+        }
+        .slide-container.active {
+            display: flex;
+            opacity: 1;
+        }
+        .text-panel {
+            width: 60%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            z-index: 10;
+        }
+        .visual-panel {
+            width: 40%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 5;
+        }
+        .slide-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: #1a202c;
+            line-height: 1.2;
+            margin-bottom: 2rem;
+            border-left: 8px solid #4a90e2;
+            padding-left: 1.5rem;
+        }
+        .slide-content ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .slide-content li {
+            font-size: 1.5rem;
+            color: #4a5568;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: flex-start;
+        }
+        .slide-content li::before {
+            content: '✓';
+            color: #4a90e2;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            transform: translateY(-2px);
+        }
+        
+        .nav-buttons {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 20;
+        }
+        .nav-button {
+            padding: 0.75rem 1.5rem;
+            background-color: #4a90e2;
+            color: white;
+            font-weight: 700;
+            border-radius: 0.75rem;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .nav-button:hover {
+            background-color: #3b74c2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .nav-button:disabled {
+            background-color: #cbd5e0;
+            cursor: not-allowed;
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        /* SVG 圖形樣式 */
+        .svg-icon {
+            width: 80%;
+            height: auto;
+        }
+        .svg-icon path, .svg-icon line, .svg-icon circle {
+            transition: all 0.5s ease-in-out;
+        }
+        
+        .visual-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .brain {
+            width: 80%;
+            height: auto;
+            position: relative;
+            animation: pulse 3s infinite ease-in-out;
+            opacity: 0.8;
+            filter: drop-shadow(0 10px 15px rgba(37, 99, 235, 0.4));
+        }
+        .data-flow {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background: linear-gradient(45deg, #f56565, #f6e05e);
+            border-radius: 50%;
+            animation: flow 5s linear infinite;
+        }
+        .data-flow:nth-child(1) { top: 10%; left: 5%; animation-delay: 0s; }
+        .data-flow:nth-child(2) { top: 30%; left: 20%; animation-delay: 1s; }
+        .data-flow:nth-child(3) { top: 50%; left: 15%; animation-delay: 2s; }
+        .data-flow:nth-child(4) { top: 70%; left: 30%; animation-delay: 3s; }
+        .data-flow:nth-child(5) { top: 85%; left: 25%; animation-delay: 4s; }
+        
+        /* 關鍵幀動畫 */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes flow {
+            0% { transform: translate(0, 0); opacity: 0; }
+            20% { transform: translate(50px, -50px); opacity: 1; }
+            80% { transform: translate(200px, 50px); opacity: 1; }
+            100% { transform: translate(250px, 100px); opacity: 0; }
+        }
+        
+        /* SVG的漸變顏色 */
+        .svg-gradient-start { stop-color: #6366f1; }
+        .svg-gradient-end { stop-color: #2563eb; }
+        
+        /* 動畫齒輪 */
+        .animate-spin-slow {
+            animation: spin 10s linear infinite;
+        }
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+    </style>
+</head>
+<body class="bg-gray-100">
+    
+    <!-- 簡報封面頁 -->
+    <div id="slide-0" class="slide-container active">
+        <div class="text-panel">
+            <h1 class="text-6xl font-bold text-gray-900 mb-4">知識管理</h1>
+            <p class="text-3xl text-gray-600 mb-8">整合、共享與創新的智慧系統</p>
+            <p class="text-lg text-gray-500">將組織內分散的經驗、數據與洞見，轉化為可傳承的資產，賦予團隊更強大的決策能力。</p>
+        </div>
+        <div class="visual-panel">
+            <div class="visual-container">
+                <!-- 知識庫與數據流的SVG意象 -->
+                <svg class="brain" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- 漸變色定義 -->
+                    <defs>
+                        <linearGradient id="brainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" class="svg-gradient-start" />
+                            <stop offset="100%" class="svg-gradient-end" />
+                        </linearGradient>
+                        <radialGradient id="dataPointGradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                            <stop offset="0%" stop-color="#fff" stop-opacity="1" />
+                            <stop offset="100%" stop-color="#fff" stop-opacity="0" />
+                        </radialGradient>
+                    </defs>
+                    <!-- 大腦/知識庫形狀 -->
+                    <path d="M50 5 C35 5 20 15 20 30 C20 45 35 60 50 60 C65 60 80 45 80 30 C80 15 65 5 50 5 Z" fill="url(#brainGradient)" stroke="#6366f1" stroke-width="2" opacity="0.8"/>
+                    <path d="M50 60 C35 60 20 70 20 85 C20 95 35 100 50 100 C65 100 80 95 80 85 C80 70 65 60 50 60 Z" fill="url(#brainGradient)" stroke="#6366f1" stroke-width="2" opacity="0.8"/>
+                    <path d="M50 5 C50 20 35 35 20 35 L20 30 C35 15 50 5 50 5 Z" fill="#4f46e5" opacity="0.3"/>
+                    <path d="M50 5 C50 20 65 35 80 35 L80 30 C65 15 50 5 50 5 Z" fill="#4f46e5" opacity="0.3"/>
+                    
+                    <!-- 內部數據節點與連線 -->
+                    <circle cx="50" cy="40" r="3" fill="#ffffff" />
+                    <circle cx="40" cy="50" r="3" fill="#ffffff" />
+                    <circle cx="60" cy="50" r="3" fill="#ffffff" />
+                    <circle cx="50" cy="70" r="3" fill="#ffffff" />
+                    <circle cx="35" cy="75" r="3" fill="#ffffff" />
+                    <circle cx="65" cy="75" r="3" fill="#ffffff" />
+                    
+                    <line x1="50" y1="40" x2="40" y2="50" stroke="#ffffff" stroke-width="0.5" opacity="0.6"/>
+                    <line x1="50" y1="40" x2="60" y2="50" stroke="#ffffff" stroke-width="0.5" opacity="0.6"/>
+                    <line x1="40" y1="50" x2="50" y2="70" stroke="#ffffff" stroke-width="0.5" opacity="0.6"/>
+                    <line x1="60" y1="50" x2="50" y2="70" stroke="#ffffff" stroke-width="0.5" opacity="0.6"/>
+                    <line x1="50" y1="70" x2="35" y2="75" stroke="#ffffff" stroke-width="0.5" opacity="0.6"/>
+                    <line x1="50" y1="70" x2="65" y2="75" stroke="#ffffff" stroke-width="0.5" opacity="0.6"/>
+                </svg>
+
+                <!-- 飄動的數據流點 -->
+                <div class="data-flow"></div>
+                <div class="data-flow" style="animation-delay: 1s;"></div>
+                <div class="data-flow" style="animation-delay: 2s;"></div>
+                <div class="data-flow" style="animation-delay: 3s;"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 簡報第一頁：知識整合策略 -->
+    <div id="slide-1" class="slide-container">
+        <div class="text-panel">
+            <h1 class="slide-title">A. 知識整合策略</h1>
+            <div class="slide-content">
+                <ul>
+                    <li>建立跨部門協作平台，整合分散經驗與數據。</li>
+                    <li>制定知識分類與標準化流程，確保一致性與可搜尋性。</li>
+                    <li>引入數位化工具，提升知識彙整與檢索效率。</li>
+                </ul>
+            </div>
+        </div>
+        <div class="visual-panel">
+            <!-- SVG 意象：多個數據塊匯集到一個中心點 -->
+            <svg class="svg-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="5" y="10" width="20" height="20" fill="#4a90e2" opacity="0.6" rx="3" />
+                <rect x="75" y="15" width="20" height="20" fill="#4a90e2" opacity="0.6" rx="3" />
+                <rect x="10" y="70" width="20" height="20" fill="#4a90e2" opacity="0.6" rx="3" />
+                <rect x="70" y="75" width="20" height="20" fill="#4a90e2" opacity="0.6" rx="3" />
+                
+                <rect x="40" y="40" width="20" height="20" fill="#4a90e2" rx="5" class="transition-transform duration-500 hover:scale-110"/>
+                
+                <path d="M25 20 L45 45" stroke="#4a90e2" stroke-width="2" opacity="0.4" class="transition-opacity duration-500 hover:opacity-100" />
+                <path d="M85 25 L55 45" stroke="#4a90e2" stroke-width="2" opacity="0.4" class="transition-opacity duration-500 hover:opacity-100" />
+                <path d="M20 80 L45 55" stroke="#4a90e2" stroke-width="2" opacity="0.4" class="transition-opacity duration-500 hover:opacity-100" />
+                <path d="M80 85 L55 55" stroke="#4a90e2" stroke-width="2" opacity="0.4" class="transition-opacity duration-500 hover:opacity-100" />
+            </svg>
+        </div>
+    </div>
+
+    <!-- 簡報第二頁：知識共享機制 -->
+    <div id="slide-2" class="slide-container">
+        <div class="text-panel">
+            <h1 class="slide-title">B. 知識共享機制</h1>
+            <div class="slide-content">
+                <ul>
+                    <li>推動內部社群與工作坊，促進洞見交流與傳承。</li>
+                    <li>建立知識分享獎勵制度，鼓勵主動分享與回饋。</li>
+                    <li>設計可視化儀表板，讓決策者即時掌握關鍵資訊。</li>
+                </ul>
+            </div>
+        </div>
+        <div class="visual-panel">
+            <!-- SVG 意象：一個中心人物周圍有其他人物連線，代表共享社群 -->
+            <svg class="svg-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="20" fill="#4a90e2" opacity="0.8" class="transition-transform duration-500 hover:scale-110"/>
+                <circle cx="20" cy="20" r="10" fill="#f6e05e" opacity="0.6" class="transition-transform duration-500 hover:scale-125"/>
+                <circle cx="80" cy="25" r="10" fill="#f6e05e" opacity="0.6" class="transition-transform duration-500 hover:scale-125"/>
+                <circle cx="25" cy="80" r="10" fill="#f6e05e" opacity="0.6" class="transition-transform duration-500 hover:scale-125"/>
+                <circle cx="75" cy="85" r="10" fill="#f6e05e" opacity="0.6" class="transition-transform duration-500 hover:scale-125"/>
+                
+                <path d="M50 50 L20 20" stroke="#f6e05e" stroke-width="1.5" opacity="0.6" class="transition-opacity duration-500 hover:opacity-100"/>
+                <path d="M50 50 L80 25" stroke="#f6e05e" stroke-width="1.5" opacity="0.6" class="transition-opacity duration-500 hover:opacity-100"/>
+                <path d="M50 50 L25 80" stroke="#f6e05e" stroke-width="1.5" opacity="0.6" class="transition-opacity duration-500 hover:opacity-100"/>
+                <path d="M50 50 L75 85" stroke="#f6e05e" stroke-width="1.5" opacity="0.6" class="transition-opacity duration-500 hover:opacity-100"/>
+            </svg>
+        </div>
+    </div>
+    
+    <!-- 簡報第三頁：創新應用與決策支持 -->
+    <div id="slide-3" class="slide-container">
+        <div class="text-panel">
+            <h1 class="slide-title">C. 創新應用與決策支持</h1>
+            <div class="slide-content">
+                <ul>
+                    <li>利用數據分析與人工智慧，挖掘新商機與改進方案。</li>
+                    <li>將知識資產應用於新產品開發與流程優化。</li>
+                    <li>透過持續創新循環，強化團隊快速應變與判斷能力。</li>
+                </ul>
+            </div>
+        </div>
+        <div class="visual-panel">
+            <!-- SVG 意象：一個齒輪內部有一個燈泡，代表創新與應用 -->
+            <svg class="svg-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="40" stroke="#4a90e2" stroke-width="3" fill="none" class="animate-spin-slow"/>
+                <circle cx="50" cy="50" r="30" fill="#e2e8f0" class="transition-transform duration-500 hover:scale-95"/>
+                <path d="M50 20 L50 80 M20 50 L80 50 M30 30 L70 70 M30 70 L70 30" stroke="#4a90e2" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+                
+                <!-- 燈泡 -->
+                <path d="M40 55 C40 65 60 65 60 55 L60 45 C60 40 55 35 50 35 C45 35 40 40 40 45 L40 55 Z" fill="#f6e05e" stroke="#ecc94b" stroke-width="1.5" />
+                <path d="M50 35 L50 30" stroke="#ecc94b" stroke-width="2" stroke-linecap="round" />
+                <path d="M45 60 L55 60 M45 65 L55 65 M45 70 L55 70" stroke="#ecc94b" stroke-width="1" stroke-linecap="round" opacity="0.8"/>
+            </svg>
+        </div>
+    </div>
+    
+    <!-- 簡報第四頁：總結 -->
+    <div id="slide-4" class="slide-container">
+        <div class="text-panel">
+            <h1 class="slide-title">總結</h1>
+            <div class="slide-content">
+                <ul>
+                    <li>知識管理是組織成長的核心動能。</li>
+                    <li>透過系統化策略與機制，將知識轉化為競爭優勢。</li>
+                    <li>持續創新與應用，賦予團隊面對未來挑戰的應變力。</li>
+                </ul>
+            </div>
+        </div>
+        <div class="visual-panel">
+            <!-- SVG 意象：一個箭頭向上，代表成長與前進 -->
+            <svg class="svg-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50 20 L75 50 L60 50 L60 80 L40 80 L40 50 L25 50 L50 20 Z" fill="#4a90e2" class="transition-transform duration-500 hover:scale-110"/>
+                <path d="M50 20 L75 50 L60 50 M60 80 L40 80 M40 50 L25 50 L50 20" stroke="#fff" stroke-width="2" opacity="0.8" />
+            </svg>
+        </div>
+    </div>
+
+    <!-- 導航按鈕 -->
+    <div class="nav-buttons">
+        <button id="prevBtn" class="nav-button" disabled>上一頁</button>
+        <button id="nextBtn" class="nav-button">下一頁</button>
+    </div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide-container');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        let currentSlide = 0;
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                if (i === index) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+            updateButtons();
+        }
+
+        function updateButtons() {
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+        }
+
+        prevBtn.addEventListener('click', () => {
+            if (currentSlide > 0) {
+                currentSlide--;
+                showSlide(currentSlide);
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentSlide < slides.length - 1) {
+                currentSlide++;
+                showSlide(currentSlide);
+            }
+        });
+
+        window.onload = () => {
+            showSlide(currentSlide);
+        };
+    </script>
+</body>
+</html>
